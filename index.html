@@ -286,7 +286,7 @@
         </div>
         <div class="mc reveal">
           <div class="mc-rail">
-            <div class="mc-rail-head"><span>The slate</span><span id="rosterCount">06</span></div>
+            <div class="mc-rail-head"><span>The slate</span><span id="rosterCount">07</span></div>
             <div id="missionList"></div>
           </div>
           <div class="mc-detail" id="missionDetail"></div>
@@ -329,6 +329,7 @@
             <a class="cact" href="https://www.linkedin.com/in/aron-jose001/" target="_blank" rel="noopener"><span class="ci">in</span><span><span class="cl">LinkedIn</span><span class="cv">aron-jose001</span></span></a>
             <a class="cact" href="https://github.com/aronjose2005" target="_blank" rel="noopener"><span class="ci">⌥</span><span><span class="cl">GitHub</span><span class="cv">aronjose2005</span></span></a>
             <a class="cact" href="https://careeros.duckdns.org/" target="_blank" rel="noopener"><span class="ci">◆</span><span><span class="cl">Live project</span><span class="cv">CareerOS ↗</span></span></a>
+            <a class="cact" href="https://github.com/aronjose2005/flakehound" target="_blank" rel="noopener"><span class="ci">⬡</span><span><span class="cl">Open source</span><span class="cv">Flakehound ↗</span></span></a>
             <a class="cact" id="resumeAct"><span class="ci">▤</span><span><span class="cl">Résumé</span><span class="cv">Download PDF</span></span></a>
           </div>
           <div class="compose">
@@ -428,6 +429,21 @@ const MISSIONS=[
     },
     stack:["React","FastAPI","LangChain","PostgreSQL","Redis","Docker","Kubernetes","Terraform","AWS","GitHub Actions"]
   },
+  {
+    id:"flakehound", name:"Flakehound", status:"live", type:"Developer tooling · flaky-test root cause",
+    live:"", repo:"https://github.com/aronjose2005/flakehound",
+    tagline:"An open-source tool that finds out why a test is flaky — not just that it is — by diffing a test's passing and failing runs down to the exact line causing the non-determinism.",
+    scenes:{
+      "Opening Scene":"Flakehound is a Python CLI and pytest plugin that hunts down the root cause of flaky tests. Point it at a test that passes and fails on the same code; it runs the test until it has caught both outcomes, compares the execution paths, and names the line — and the reason — behind the non-determinism.",
+      "The Problem":"Flaky tests are a systemic tax on engineering teams — Google has reported that roughly one in seven of their tests showed flakiness at some point. An entire market exists to detect and quarantine them, but detection only tells you a test is unreliable. It never tells you the one thing that actually fixes it: which line is causing the randomness, and why.",
+      "Engineering Breakdown":"A two-phase execution engine separates concerns. An untraced phase records clean outcomes and real wall-clock timing; a traced phase, built on sys.settrace, records the exact line-by-line path and variable values. Spectrum-based fault localization (the Ochiai formula) ranks suspicious lines, a discriminating-variable pass isolates values that cleanly separate passing from failing runs, and an AST scan flags sources of non-determinism — time, random, unordered iteration, threads — across every file the test touches.",
+      "Key Innovation":"It productizes a technique that previously lived only inside Google's internal tooling and in academic papers — code-level root-cause localization — as an open tool any developer can install. And it respects the observer effect: tracing distorts timing, so a flaky test is itself a Heisenbug; the engine never trusts traced timings and reasons about timing only from clean, untraced runs.",
+      "Challenges":"Resolving real pytest tests — fixtures, setup and teardown — without fighting pytest's lifecycle meant hooking execution at exactly the right layer, after fixtures resolve. Separating a true root-cause variable from per-run noise meant requiring clean threshold separation for numbers and repetition for categories, so a timestamp that changes every run is rejected while the variable that actually flips the outcome is kept.",
+      "Lessons Learned":"Genuine whitespace in a crowded space is rare, and it hides in the hard part everyone avoids — here, the root-cause core rather than the detection that others already ship. Building it surfaced the unglamorous engineering that makes a tool trustworthy: deciding what to trace, separating signal from noise, and being honest about confidence.",
+      "Future Vision":"Dedicated test-order-dependency detection that names the polluting test by comparing isolated and suite-order runs, an optional LLM layer that turns the structured evidence into a plain-English explanation and a concrete fix, a GitHub Action that posts root-cause findings straight onto the pull request, and a measured accuracy benchmark mined from real commits that fixed flaky tests."
+    },
+    stack:["Python","pytest plugin","sys.settrace","Ochiai SBFL","AST analysis","CLI","Git","MIT"]
+  },
   { id:"neurochain", name:"NeuroChain", status:"pending", type:"EEG · neural signal system",
     questions:["Opening scene — in one line, what does NeuroChain do?","The problem — what gap in EEG / neuro work does it close?","Engineering — what's the role of the 'chain' (provenance, verification, something else)? Which dataset or hardware?","Key innovation — the one thing that makes it yours.","Challenges — the hardest problem you hit, and how you beat it.","Live demo or repo link?"] },
   { id:"sentienthire", name:"SentientHire", status:"pending", type:"AI hiring system",
@@ -457,7 +473,7 @@ function renderLive(m){
   return `<div class="d-eyebrow"><span>◆ ${m.type}</span><span class="mstatus live">live</span></div>
     <h3>${m.name}</h3><p class="tagline">${m.tagline}</p>${scenes}
     <div class="scene"><div class="lbl">—<b>Stack</b></div><div class="stack-chips">${m.stack.map(s=>`<span class="chip">${s}</span>`).join("")}</div></div>
-    <div class="d-links"><a href="${m.live}" target="_blank" rel="noopener">Open live ↗</a><a href="${m.repo}" target="_blank" rel="noopener">Source ↗</a></div>`;
+    <div class="d-links">${m.live?`<a href="${m.live}" target="_blank" rel="noopener">Open live ↗</a>`:""}<a href="${m.repo}" target="_blank" rel="noopener">Source ↗</a></div>`;
 }
 function renderBrief(m){
   return `<div class="d-eyebrow"><span>◷ ${m.type}</span><span class="mstatus pending">brief pending</span></div>
@@ -476,12 +492,13 @@ VERIFIED FACTS (use only these):
 - Aron Jose is an engineer based in India.
 - Disciplines: AI Engineer, Machine Learning Engineer, Cloud Engineer, DevOps Engineer, and Quantum Computing enthusiast.
 - Live flagship: CareerOS (careeros.duckdns.org) — an AI career platform. Stack: React, FastAPI, LangChain, PostgreSQL, Redis, Docker, Kubernetes, Terraform, AWS, GitHub Actions.
+- Second shipped project (open-source, MIT): Flakehound (github.com/aronjose2005/flakehound) — a Python CLI and pytest plugin that finds the root cause of flaky tests, not just that a test is flaky. It runs a failing test repeatedly, diffs passing vs failing execution paths, and points to the exact line causing the non-determinism — including in the application code the test imports. Stack: Python, pytest plugin, sys.settrace runtime tracing, Ochiai spectrum-based fault localization, AST analysis.
 - Other projects, names only here: NeuroChain (EEG), SentientHire (AI hiring), ChronoML (temporal ML), Quantum GAN ECG Generation (quantum ML), ADIPS. Their detailed briefs are still being finalized.
 - Contact: aronjose535@gmail.com · linkedin.com/in/aron-jose001 · github.com/aronjose2005
 
 RULES:
 - For specifics on any project other than CareerOS, be candid that the brief is being finalized; point to the GitHub or to contacting Aron. NEVER invent features, metrics, datasets, or results.
-- The message is pre-classified; you'll be told the intent. Match the register: greeting -> one warm sentence inviting a question; recruiter -> crisp value plus an invitation to connect; project -> CareerOS confidently, others candidly; architecture -> technical and specific about CareerOS; career -> grounded and forward-looking; smalltalk -> brief and human.
+- The message is pre-classified; you'll be told the intent. Match the register: greeting -> one warm sentence inviting a question; recruiter -> crisp value plus an invitation to connect; project -> CareerOS and Flakehound confidently, others candidly; architecture -> technical and specific about CareerOS; career -> grounded and forward-looking; smalltalk -> brief and human.
 - Keep replies tight: 2 to 5 sentences. Confident, technical, never salesy. Plain text only, no markdown.`;
 function classify(t){
   t=t.toLowerCase().trim(); const w=t.split(/\s+/).length; const has=(...a)=>a.some(k=>t.includes(k));
@@ -489,16 +506,16 @@ function classify(t){
   if(/^(good\s(morning|afternoon|evening))/.test(t))return"greeting";
   if(has("hire","hiring","recruit","candidate","role","position","opening","vacancy","available","opportunity","onboard","notice","ctc","salary","why should","looking for","fit for"))return"recruiter";
   if(has("architecture","system design","how does","how is","how did you build","scale","scaling","infrastructure","infra","deploy","kubernetes","docker","rag","pipeline","database","tech stack","stack"))return"architecture";
-  if(has("project","careeros","neurochain","sentienthire","chronoml","quantum","ecg","adips","built","build","github","show me","your work","portfolio"))return"project";
+  if(has("project","careeros","flakehound","flaky","pytest","neurochain","sentienthire","chronoml","quantum","ecg","adips","built","build","github","show me","your work","portfolio"))return"project";
   if(has("journey","story","background","got into","experience","goal","future","why ai","learn","studied","study"))return"career";
   if(has("how are you","what's up","whats up","who are you","joke","weather","favourite","favorite","yourself"))return"smalltalk";
   return"general";
 }
 const FALLBACK={
   greeting:"Hey — good to have you here. Ask me about Aron's work, his stack, or what he's looking for next.",
-  recruiter:"Aron builds production AI systems and the infrastructure beneath them — his live project, CareerOS, runs on FastAPI, LangChain, Kubernetes and AWS. If you're hiring for AI or DevOps, open CareerOS, then reach out at aronjose535@gmail.com or on LinkedIn.",
+  recruiter:"Aron builds production AI systems and the infrastructure beneath them — his live project, CareerOS, runs on FastAPI, LangChain, Kubernetes and AWS — and he ships open-source developer tools like Flakehound, which finds the root cause of flaky tests. If you're hiring for AI or DevOps, open CareerOS or his GitHub, then reach out at aronjose535@gmail.com or on LinkedIn.",
   architecture:"CareerOS is a React front end over a FastAPI service layer, with LangChain orchestrating the LLM calls. PostgreSQL holds state, Redis does caching and queues, and it all runs containerised on Kubernetes, provisioned with Terraform on AWS and shipped via GitHub Actions. Ask about any layer.",
-  project:"The flagship is CareerOS — an AI career platform live at careeros.duckdns.org. Five more are on the slate (NeuroChain, SentientHire, ChronoML, Quantum GAN ECG, ADIPS); their full launch records are being finalised, so check github.com/aronjose2005 for the latest.",
+  project:"Two are shipped: CareerOS — an AI career platform live at careeros.duckdns.org — and Flakehound, an open-source Python tool that finds the root cause of flaky tests (github.com/aronjose2005/flakehound). Five more are on the slate (NeuroChain, SentientHire, ChronoML, Quantum GAN ECG, ADIPS); their full launch records are being finalised, so check github.com/aronjose2005 for the latest.",
   career:"Aron works across AI, ML, cloud and DevOps, with a side interest in quantum computing. The fuller origin is still being written — for now, the work in The Work section is the clearest signal of how he thinks.",
   smalltalk:"Running well, thanks. I'm here to talk about Aron and what he builds — fire away.",
   general:"I can speak to Aron's work, his architecture choices, and what he's after next. What would you like to know?"
@@ -535,7 +552,7 @@ async function send(text){
 }
 document.getElementById("gptSend").addEventListener("click",()=>{const v=gptInput.value;gptInput.value="";send(v);});
 gptInput.addEventListener("keydown",e=>{if(e.key==="Enter"){const v=gptInput.value;gptInput.value="";send(v);}});
-["Hey 👋","Are you open to roles?","How is CareerOS built?","What's NeuroChain?"].forEach(s=>{
+["Hey 👋","Are you open to roles?","How is CareerOS built?","What is Flakehound?"].forEach(s=>{
   const b=document.createElement("button");b.className="sug";b.textContent=s;b.addEventListener("click",()=>send(s));document.getElementById("gptSuggest").appendChild(b);});
 addMsg("bot","I'm Aron-GPT. I route your question to the right place — recruiting, architecture, projects, or just to say hi. What brings you by?","greeting");
 
@@ -557,6 +574,7 @@ const PAL=[
   {label:"Ask Aron-GPT",hint:"chat",go:()=>{loc("#ask");setTimeout(()=>gptInput.focus(),500);}},
   {label:"Contact",hint:"reach out",go:()=>loc("#contact")},
   {label:"Open CareerOS",hint:"live ↗",go:()=>window.open("https://careeros.duckdns.org/","_blank")},
+  {label:"Open Flakehound",hint:"repo ↗",go:()=>window.open("https://github.com/aronjose2005/flakehound","_blank")},
   {label:"GitHub",hint:"↗",go:()=>window.open("https://github.com/aronjose2005","_blank")},
   {label:"Email Aron",hint:"↗",go:()=>location.href=`mailto:${EMAIL}`}
 ];
